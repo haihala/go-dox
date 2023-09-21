@@ -7,7 +7,7 @@ import (
 )
 
 func parrot(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+	fmt.Fprintf(w, "You sent '%s'", r.URL.Path[1:])
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
