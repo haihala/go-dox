@@ -11,7 +11,7 @@ func parrot(w http.ResponseWriter, r *http.Request) {
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello")
+	fmt.Fprint(w, "Hello")
 }
 
 func main() {
@@ -19,5 +19,6 @@ func main() {
 	mux.HandleFunc("/", parrot)
 	mux.HandleFunc("/hello", hello)
 
+	fmt.Println("Starting server")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
