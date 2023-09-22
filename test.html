@@ -1,0 +1,10 @@
+<li class="todo">
+    {{.Content}}
+    <button
+        hx-post="/remove/{{.Id}}"
+        hx-target="closest .todo"
+        hx-swap="outerHTML"
+    >
+        X
+    </button>
+</li>
