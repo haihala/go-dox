@@ -12,17 +12,31 @@ import (
 )
 
 type Todo struct {
+	Key  int32
 	Text string
 }
 
 type Todos struct {
-	Value []Todo
-	Mu    sync.Mutex
+	Value   []Todo
+	Counter int32
+	Mu      sync.Mutex
 }
 
-func (todos *Todos) Add(todo Todo) {
+func (todos *Todos) Add(text string) int32 {
 	todos.Mu.Lock()
-	todos.Value = append(todos.Value, todo)
+	todos.Counter++
+	todos.Value = append(todos.Value, Todo{Text: text, Key: todos.Counter})
+	defer todos.Mu.Unlock()
+	return todos.Counter
+}
+
+func (todos *Todos) Remove(id int32) {
+	todos.Mu.Lock()
+	for i, todo := range todos.Value {
+		if todo.Key == id {
+			todos.Value = append(todos.Value[:i], todos.Value[i+1:]...)
+		}
+	}
 	todos.Mu.Unlock()
 }
 
@@ -35,12 +49,7 @@ func (data *Todos) GetValue() map[string][]Todo {
 }
 
 func main() {
-	todos := &Todos{
-		Value: []Todo{
-			{Text: "Test1"},
-			{Text: "Test2"},
-		},
-	}
+	todos := &Todos{}
 
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -52,9 +61,9 @@ func main() {
 	r.Post("/add", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		field := r.Form.Get("new-todo")
-		todos.Add(Todo{Text: field})
+		key := todos.Add(field)
 
-		fmt.Fprintf(w, "<li>%s</li>", field)
+		fmt.Fprintf(w, "<li id=\"todo-%d\">%s</li>", key, field)
 	})
 
 	fmt.Println("Starting server")
