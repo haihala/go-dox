@@ -14,7 +14,7 @@
   <body>
     <ul id="todo-container">
         {{range $index, $todo := .Todos}}
-        <li>{{$todo.Text}}</li>
+            {{template "todo" $todo}}
         {{end}}
     </ul>
     <div>
